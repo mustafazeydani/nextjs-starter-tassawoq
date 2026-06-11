@@ -12,7 +12,7 @@ Network calls can fail for a variety of reasons (server errors, client offline, 
 
 We have implemented a reusable wrapper component: **`QueryErrorBoundary`** (located at `src/components/query-error-boundary.tsx`).
 
-This component wraps React Query's `<QueryErrorResetBoundary>` and a standard class-based error boundary. When an error is caught:
+This component wraps React Query's `<QueryErrorResetBoundary>` and the `ErrorBoundary` from the `react-error-boundary` library. When an error is caught:
 1. It displays a fallback UI (either default or customized).
 2. It provides a "Try Again" recovery action.
 3. When clicked, it automatically resets the query cache for the affected query keys, allowing the query to retry fetching clean.
