@@ -5,7 +5,7 @@ import { env } from "./src/lib/env"
 export default defineConfig({
   tassawoqApi: {
     input: {
-      target: `${env.NEXT_PUBLIC_API_URL}/reference.json`,
+      target: env.NEXT_PUBLIC_OPENAPI_URL,
     },
     output: {
       mode: "tags",
