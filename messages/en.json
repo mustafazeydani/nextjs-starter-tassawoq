@@ -1,25 +1,30 @@
 {
   "HomePage": {
-    "title": "Project Ready!",
-    "description": "You may now add components and start building.",
+    "title": "Project ready!",
+    "description": "This starter is wired for localized routes, shadcn/ui, theming, and API-ready data flows.",
     "buttonText": "Button",
-    "description2": "We've already added the button component for you.",
+    "description2": "Use these dummy pages as a safe place to shape the first real customer experience.",
     "toggleMode": "(Press d to toggle dark mode)",
     "aboutLink": "About Us",
-    "contactLink": "Contact Us",
-    "switchLocale": "العربية"
+    "contactLink": "Contact Us"
   },
   "AboutPage": {
     "title": "About Us",
-    "description": "Welcome to our store. We provide top tier services for our customers.",
+    "description": "Tassawoq is a polished commerce starter built for bilingual storefronts and practical product work.",
     "homeLink": "Back to Home"
   },
   "ContactPage": {
     "title": "Contact Us",
-    "description": "Get in touch with us for support and questions.",
+    "description": "Need help shaping the next screen? Send a note and we will turn the starter into something production-ready.",
     "homeLink": "Back to Home"
   },
   "common": {
+    "localeSwitcher": {
+      "englishShort": "EN",
+      "arabicShort": "AR",
+      "switchToEnglish": "Switch language to English",
+      "switchToArabic": "Switch language to Arabic"
+    },
     "errorBoundary": {
       "title": "Something went wrong",
       "description": "The page could not finish loading. Try again in a moment.",

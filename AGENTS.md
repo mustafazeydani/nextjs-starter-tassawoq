@@ -27,6 +27,7 @@ Folder names are listed first. Some skills have a different frontmatter name; th
 - `nodejs-backend-patterns` - Use for backend service or API implementation work: Express/Fastify servers, middleware, auth, database integration, REST APIs, GraphQL, and microservice structure. In this frontend starter, this is usually relevant only for added server/API service code.
 - `nodejs-best-practices` - Use for Node.js runtime decisions, async patterns, security, architecture, scripts, config files, server-side utilities, and package/runtime tradeoffs.
 - `react-best-practices` (`vercel-react-best-practices`) - Use when writing, reviewing, or refactoring React/Next.js for performance: data fetching, waterfalls, bundle size, render behavior, serialization, Suspense, client/server splitting, and expensive UI updates.
+- `react-hook-form` - Use when building, reviewing, or optimizing client-side forms with React Hook Form: `useForm`, `useWatch`, `useController`, `Controller`, `useFieldArray`, `FormProvider`, controlled UI components, shadcn form integration, and form performance. Do not use it for React 19 Server Actions, `useActionState`, or server-side form handling.
 - `seo` - Use for search-related work: metadata, Open Graph/Twitter tags, canonical URLs, sitemap/robots behavior, structured data, JSON-LD, breadcrumbs, and public content discoverability.
 - `shadcn` - Use whenever touching shadcn/ui or `components.json`: adding components, checking registry docs, presets, composing Radix/shadcn primitives, forms, dialogs, tabs, cards, buttons, icons, and component styling rules.
 - `tailwind-css-patterns` - Use for Tailwind utility work: responsive layout, grid/flex, spacing, typography, colors, state variants, animation utilities, and maintainable utility composition.
@@ -38,5 +39,5 @@ Folder names are listed first. Some skills have a different frontmatter name; th
 
 - For most UI feature work, start with `frontend-conventions`, then add `next-best-practices`, `react-best-practices`, `i18n-conventions`, `shadcn`, `tailwind-css-patterns`, or `frontend-design` as the change requires.
 - For public-facing pages, pair `seo` with `frontend-conventions`, `i18n-conventions`, and `accessibility`.
-- For forms, pair `shadcn`, `zod`, `accessibility`, and `i18n-conventions` when labels, validation messages, or RTL behavior are involved.
+- For client-side forms, pair `react-hook-form` with `shadcn`, `zod`, `accessibility`, and `i18n-conventions` when controlled inputs, validation, labels, error messages, or RTL behavior are involved.
 - For cache or rendering model changes, pair `next-best-practices`, `next-cache-components`, and `react-best-practices`.

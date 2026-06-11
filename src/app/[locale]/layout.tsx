@@ -5,6 +5,7 @@ import { getLocale, getMessages } from "next-intl/server"
 import "../globals.css"
 import { QueryProvider } from "@/components/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
+import { DirectionProvider } from "@/components/ui/direction"
 import { routing } from "@/i18n/routing"
 import { cn } from "@/lib/utils"
 
@@ -46,11 +47,13 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
       )}
     >
       <body>
-        <NextIntlClientProvider messages={clientMessages}>
-          <QueryProvider>
-            <ThemeProvider>{children}</ThemeProvider>
-          </QueryProvider>
-        </NextIntlClientProvider>
+        <DirectionProvider direction={direction}>
+          <NextIntlClientProvider messages={clientMessages}>
+            <QueryProvider>
+              <ThemeProvider>{children}</ThemeProvider>
+            </QueryProvider>
+          </NextIntlClientProvider>
+        </DirectionProvider>
       </body>
     </html>
   )
