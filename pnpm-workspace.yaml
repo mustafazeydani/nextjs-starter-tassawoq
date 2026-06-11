@@ -5,7 +5,14 @@ allowBuilds:
   unrs-resolver: true
   msw: false
   lefthook: true
+  "@parcel/watcher": true
+  "@swc/core": true
+
 
 blockExoticSubdeps: true
 minimumReleaseAge: 1440
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - eslint-import-resolver-typescript
+  - semver
+  - undici-types
