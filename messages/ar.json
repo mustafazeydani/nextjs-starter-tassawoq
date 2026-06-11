@@ -1,0 +1,22 @@
+{
+  "HomePage": {
+    "title": "المشروع جاهز!",
+    "description": "يمكنك الآن إضافة المكونات والبدء في البناء.",
+    "buttonText": "زر",
+    "description2": "لقد أضفنا بالفعل مكون الزر لك.",
+    "toggleMode": "(اضغط على d لتبديل الوضع الداكن)",
+    "aboutLink": "من نحن",
+    "contactLink": "اتصل بنا",
+    "switchLocale": "English"
+  },
+  "AboutPage": {
+    "title": "من نحن",
+    "description": "مرحبًا بكم في متجرنا. نحن نقدم خدمات متميزة لعملائنا.",
+    "homeLink": "العودة إلى الرئيسية"
+  },
+  "ContactPage": {
+    "title": "اتصل بنا",
+    "description": "تواصل معنا للدعم والاستفسارات.",
+    "homeLink": "العودة إلى الرئيسية"
+  }
+}

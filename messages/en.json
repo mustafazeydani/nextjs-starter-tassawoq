@@ -1,0 +1,22 @@
+{
+  "HomePage": {
+    "title": "Project Ready!",
+    "description": "You may now add components and start building.",
+    "buttonText": "Button",
+    "description2": "We've already added the button component for you.",
+    "toggleMode": "(Press d to toggle dark mode)",
+    "aboutLink": "About Us",
+    "contactLink": "Contact Us",
+    "switchLocale": "العربية"
+  },
+  "AboutPage": {
+    "title": "About Us",
+    "description": "Welcome to our store. We provide top tier services for our customers.",
+    "homeLink": "Back to Home"
+  },
+  "ContactPage": {
+    "title": "Contact Us",
+    "description": "Get in touch with us for support and questions.",
+    "homeLink": "Back to Home"
+  }
+}
