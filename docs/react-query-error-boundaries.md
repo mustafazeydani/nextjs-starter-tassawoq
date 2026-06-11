@@ -1,100 +1,153 @@
-# React Query Error Boundaries Convention
+# React Query Error Boundaries
 
-This document outlines the standard guidelines and patterns for handling data-fetching and query errors in this project using TanStack Query (React Query) v5 and the custom `QueryErrorBoundary` component.
+This project uses TanStack Query v5, `react-error-boundary`, and the custom API mutator in `src/api/mutator/custom-instance.ts`.
 
-## Why Use Error Boundaries for Queries?
+## Runtime Setup
 
-Network calls can fail for a variety of reasons (server errors, client offline, rate limits). Instead of allowing failing network calls to crash the entire page layout or silently fail leaving loading spinners forever, we use React Error Boundaries to catch these errors and display localized recovery options.
+`src/app/[locale]/layout.tsx` wraps the app with `QueryProvider`, which installs the browser `QueryClient` used by generated Orval hooks. The provider may render during SSR, but server data fetching should use the direct generated request functions described in `docs/orval-react-query-client.md`.
 
----
+Default query behavior lives in `src/components/query-provider.tsx`:
 
-## The `QueryErrorBoundary` Component
+- Queries retry at most twice.
+- 408, 429, 5xx, and unknown network failures are retried.
+- 4xx API errors are not retried.
+- 5xx and unknown network failures are thrown to the nearest error boundary.
+- 4xx errors stay in the query result so forms and auth flows can render local messages.
+- Mutations do not retry by default and do not throw to boundaries by default.
 
-We have implemented a reusable wrapper component: **`QueryErrorBoundary`** (located at `src/components/query-error-boundary.tsx`).
+## Boundary Layers
 
-This component wraps React Query's `<QueryErrorResetBoundary>` and the `ErrorBoundary` from the `react-error-boundary` library. When an error is caught:
-1. It displays a fallback UI (either default or customized).
-2. It provides a "Try Again" recovery action.
-3. When clicked, it automatically resets the query cache for the affected query keys, allowing the query to retry fetching clean.
+Use the right boundary for the failure scope:
 
----
+- `src/app/[locale]/error.tsx` handles uncaught render/server errors for localized route content.
+- `src/app/global-error.tsx` handles root layout failures and must stay self-contained.
+- `QueryErrorBoundary` handles a local client data region and resets failed React Query state.
 
-## Guidelines and Conventions
+Prefer a local `QueryErrorBoundary` around dashboards, lists, panels, and widgets that can recover independently. Let route `error.tsx` catch broader page-level failures.
 
-### 1. Enable `throwOnError: true`
-By default, React Query swallows query errors and returns them in the `error` state. To propagate errors up to the Error Boundary, you **must** configure `throwOnError: true` on the query hook (or use a dynamic callback function).
+## Local Query Boundary
 
-```tsx
-import { useQuery } from "@tanstack/react-query"
-
-// Inside your client component:
-const { data } = useQuery({
-  queryKey: ["userData"],
-  queryFn: fetchUserData,
-  
-  // Enforce error propagation to Error Boundary
-  throwOnError: true 
-})
-```
-
-*Note: If you are using React Query's `useSuspenseQuery`, `throwOnError: true` is enabled by default.*
-
----
-
-### 2. Selective Error Propagation (Optional)
-If you only want certain types of errors (e.g. 5xx Server Errors) to trigger the Error Boundary while handling 4xx Validation Errors locally, pass a validation function to `throwOnError`:
+Wrap the component that calls generated query hooks from the outside:
 
 ```tsx
-const { data } = useQuery({
-  queryKey: ["userData"],
-  queryFn: fetchUserData,
-  throwOnError: (error: any) => {
-    // Only crash/show boundary for Server Errors
-    return error.response?.status >= 500
-  }
-})
-```
+"use client"
 
----
-
-### 3. Wrap Components with `<QueryErrorBoundary>`
-Wrap components executing network hooks inside the `<QueryErrorBoundary>`. Ensure the boundary wraps the components containing the hooks, **not** inside the component itself.
-
-#### Recommended Structure:
-
-```tsx
 import { QueryErrorBoundary } from "@/components/query-error-boundary"
-import { UserProfile } from "./user-profile"
+import { ProductList } from "./product-list"
 
-export function Dashboard() {
+export function ProductListPanel() {
   return (
-    <div className="dashboard-layout">
-      <h1>Dashboard</h1>
-      
-      {/* Catch errors from UserProfile query hooks */}
-      <QueryErrorBoundary>
-        <UserProfile />
-      </QueryErrorBoundary>
-    </div>
+    <QueryErrorBoundary resetKeys={["products"]}>
+      <ProductList />
+    </QueryErrorBoundary>
   )
 }
 ```
 
----
+Do not place the boundary inside `ProductList` if `ProductList` is the component that calls the query hook. A boundary only catches errors thrown by children during render.
 
-### 4. Provide Custom Fallbacks (Optional)
-You can customize the error fallback interface by passing a `fallback` prop, which can be custom JSX or a function returning JSX with the error and reset callback:
+## Generated Hook Errors
+
+Generated hooks use `ApiRequestError` as their error type. Handle expected 4xx states locally:
+
+```tsx
+"use client"
+
+import { useProductsControllerAll } from "@/api/generated/react-query/products"
+import { getApiErrorStatus } from "@/lib/api-error"
+
+export function ProductList() {
+  const query = useProductsControllerAll({ page: 1, limit: 20 })
+
+  if (query.isPending) {
+    return <ProductListSkeleton />
+  }
+
+  if (query.isError) {
+    const status = getApiErrorStatus(query.error)
+
+    if (status === 404) {
+      return <EmptyProducts />
+    }
+
+    if (status && status < 500) {
+      return <RequestErrorMessage status={status} />
+    }
+
+    throw query.error
+  }
+
+  return <Products items={query.data.data.items} />
+}
+```
+
+The explicit `throw query.error` is only needed when you override query defaults or want to escalate a specific local branch.
+
+## Custom Fallbacks
+
+Use a custom fallback when a panel needs domain-specific copy or layout:
 
 ```tsx
 <QueryErrorBoundary
   fallback={(error, reset) => (
-    <div className="alert alert-danger">
-      <h4>Failed to load dashboard data</h4>
-      <p>{error.message}</p>
-      <button onClick={reset}>Reload Data</button>
-    </div>
+    <ErrorState
+      title="Products could not load"
+      description="Refresh this panel without leaving the page."
+      actionLabel="Reload products"
+      onAction={reset}
+      detail={process.env.NODE_ENV === "development" ? error.message : undefined}
+    />
   )}
 >
-  <UserProfile />
+  <ProductList />
 </QueryErrorBoundary>
+```
+
+The default fallback intentionally hides raw error messages in production.
+
+## Mutations
+
+Keep mutation errors close to the form or action that caused them:
+
+```tsx
+const login = useAuthControllerLogin({
+  mutation: {
+    onError(error) {
+      const status = getApiErrorStatus(error)
+
+      if (status === 401) {
+        form.setError("email", { message: "Invalid email or password" })
+      }
+    },
+  },
+})
+```
+
+Use mutation `throwOnError` only for unexpected failures that should leave the local form flow:
+
+```tsx
+const save = useProductsControllerAdd({
+  mutation: {
+    throwOnError: (error) => !getApiErrorStatus(error),
+  },
+})
+```
+
+## Next.js Errors
+
+`redirect()`, `notFound()`, `permanentRedirect()`, and request-time APIs can throw framework-controlled errors. Do not swallow them in broad catch blocks. If a catch block may receive both app errors and Next framework errors, call `unstable_rethrow(error)` first.
+
+```tsx
+import { notFound, unstable_rethrow } from "next/navigation"
+
+try {
+  const product = await getProduct()
+
+  if (!product) {
+    notFound()
+  }
+} catch (error) {
+  unstable_rethrow(error)
+  throw error
+}
 ```

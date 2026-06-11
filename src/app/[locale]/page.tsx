@@ -1,16 +1,10 @@
-import { getTranslations, setRequestLocale } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
 
 import { Button } from "@/components/ui/button"
-import { Link } from "@/i18n/routing"
+import { Link } from "@/i18n/navigation"
 
-interface Props {
-  params: Promise<{ locale: string }>
-}
-
-export default async function Page({ params }: Props) {
-  const { locale } = await params
-  setRequestLocale(locale)
-
+export default async function Page() {
+  const locale = await getLocale()
   const t = await getTranslations("HomePage")
   const nextLocale = locale === "en" ? "ar" : "en"
 

@@ -3,22 +3,30 @@
 import { QueryErrorResetBoundary } from "@tanstack/react-query"
 import type { ReactNode } from "react"
 import { ErrorBoundary } from "react-error-boundary"
-import { Button } from "./ui/button"
+import { getApiErrorStatus } from "@/lib/api-error"
+import { ErrorState } from "./error-state"
 
 interface Props {
   children: ReactNode
   fallback?: ReactNode | ((error: Error, reset: () => void) => ReactNode)
+  resetKeys?: unknown[]
 }
 
-export function QueryErrorBoundary({ children, fallback }: Props) {
+export function QueryErrorBoundary({ children, fallback, resetKeys }: Props) {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary
           onReset={reset}
+          resetKeys={resetKeys}
           fallbackRender={({ error, resetErrorBoundary }) => {
             const errorInstance =
               error instanceof Error ? error : new Error(String(error))
+            const status = getApiErrorStatus(errorInstance)
+            const detail =
+              process.env.NODE_ENV === "development"
+                ? errorInstance.message
+                : undefined
 
             if (typeof fallback === "function") {
               return fallback(errorInstance, resetErrorBoundary)
@@ -27,21 +35,17 @@ export function QueryErrorBoundary({ children, fallback }: Props) {
               return fallback
             }
             return (
-              <div className="flex max-w-sm flex-col items-center justify-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-center">
-                <p className="font-semibold text-destructive text-sm">
-                  Something went wrong fetching data.
-                </p>
-                <p className="break-all text-muted-foreground text-xs">
-                  {errorInstance.message}
-                </p>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={resetErrorBoundary}
-                >
-                  Try Again
-                </Button>
-              </div>
+              <ErrorState
+                title="Unable to load data"
+                description={
+                  status
+                    ? `The request failed with status ${status}.`
+                    : "The request failed before the server returned a response."
+                }
+                actionLabel="Try again"
+                detail={detail}
+                onAction={resetErrorBoundary}
+              />
             )
           }}
         >

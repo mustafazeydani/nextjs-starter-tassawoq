@@ -1,0 +1,4 @@
+interface:
+  display_name: "i18n Conventions"
+  short_description: "Use the repo's next-intl translation and provider patterns"
+  default_prompt: "Use $i18n-conventions to add or migrate translations, route pathnames, and scoped next-intl client providers following this repo's i18n conventions."

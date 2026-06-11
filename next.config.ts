@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  experimental: {
+    rootParams: true,
+  },
 }
 
 export default withNextIntl(nextConfig)

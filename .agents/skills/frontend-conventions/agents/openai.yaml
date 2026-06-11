@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Conventions"
+  short_description: "Follow Jobara web patterns."
+  default_prompt: "Use the Jobara frontend conventions skill to implement this web change consistently with route colocation, shared constants, and generated API patterns."

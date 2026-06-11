@@ -1,15 +1,8 @@
-import { getTranslations, setRequestLocale } from "next-intl/server"
+import { getTranslations } from "next-intl/server"
 
-import { Link } from "@/i18n/routing"
+import { Link } from "@/i18n/navigation"
 
-interface Props {
-  params: Promise<{ locale: string }>
-}
-
-export default async function ContactPage({ params }: Props) {
-  const { locale } = await params
-  setRequestLocale(locale)
-
+export default async function ContactPage() {
   const t = await getTranslations("ContactPage")
 
   return (

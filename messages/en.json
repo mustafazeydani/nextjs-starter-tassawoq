@@ -18,5 +18,13 @@
     "title": "Contact Us",
     "description": "Get in touch with us for support and questions.",
     "homeLink": "Back to Home"
+  },
+  "common": {
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "description": "The page could not finish loading. Try again in a moment.",
+      "retry": "Try again",
+      "digest": "Error reference: {digest}"
+    }
   }
 }
